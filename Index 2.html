@@ -155,29 +155,30 @@ button:hover:after { transform:scaleX(.55); }
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
 let ytPlayer;
-let ytReady = false;
-let musicStarted = false;
+let soundUnlocked = false;
 
 function onYouTubeIframeAPIReady() {
   ytPlayer = new YT.Player('yt-player', {
     videoId: 'VUiydOvobYI',
-    playerVars: { autoplay: 0, controls: 0, playsinline: 1 },
+    playerVars: { autoplay: 1, mute: 1, controls: 0, playsinline: 1 },
     events: {
-      'onReady': () => { ytReady = true; }
+      'onReady': (e) => { e.target.playVideo(); }
     }
   });
 }
 
-function startMusic() {
-  if (musicStarted || !ytReady) return;
-  musicStarted = true;
+function unlockSound() {
+  if (soundUnlocked || !ytPlayer || typeof ytPlayer.unMute !== 'function') return;
+  ytPlayer.unMute();
+  ytPlayer.setVolume(100);
   ytPlayer.playVideo();
-  document.removeEventListener('click', startMusic);
-  document.removeEventListener('touchstart', startMusic);
+  soundUnlocked = true;
+  document.removeEventListener('click', unlockSound);
+  document.removeEventListener('touchstart', unlockSound);
 }
 
-document.addEventListener('click', startMusic);
-document.addEventListener('touchstart', startMusic);
+document.addEventListener('click', unlockSound);
+document.addEventListener('touchstart', unlockSound);
 
 document.querySelectorAll('.memory').forEach((el) => {
   const img = el.querySelector('img');
